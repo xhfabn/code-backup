@@ -1,0 +1,138 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// -----------------------------------------------------------------------------
+// User: Stores user identity, preferences, and global settings
+// -----------------------------------------------------------------------------
+model User {
+  id            String     @id @default(cuid())
+  // Username used for login and display
+  username      String     @unique
+  // Avatar URL, supports external links or local paths
+  avatar        String?
+  
+  // Preference settings: affects frontend rendering
+  // Default programming language opened in the editor (kept for compatibility)
+  preferredLang String     @default("typescript")
+  // UI language, currently supports English and Chinese
+  uiLanguage    String     @default("en")
+  // Global theme color, reserved for future use
+  themeColor    String     @default("emerald")
+
+  // Daily review limit for八股文 questions
+  dailyReviewLimit Int   @default(50)
+
+  // Relations
+  // All八股文 question progress associated with the user
+  progress      Progress[]
+  // Account creation timestamp
+  createdAt     DateTime   @default(now())
+}
+
+// -----------------------------------------------------------------------------
+// Problem: Stores knowledge base questions metadata (八股文题库)
+// -----------------------------------------------------------------------------
+model Problem {
+  id              String   @id @default(cuid())
+
+  // Category of the question (e.g., "操作系统", "网络", "数据库", etc.)
+  platform        String   @default("计算机基础")
+  // Question ID within the category
+  pid             String
+  // Question title
+  title           String
+  // Used for generating URL paths (e.g., "two-sum")
+  slug            String?
+  // External reference link (optional, for八股文 usually not needed)
+  url             String?
+
+  // Question difficulty (e.g., "Easy", "Medium", "Hard")
+  difficulty      String
+  // Difficulty level as numeric value (1-5)
+  difficultyLevel Int      @default(1)
+  // Category tags, stored as a comma-separated string (e.g., "进程,线程,并发")
+  tags            String
+  // Standard answer for the question (八股文答案)
+  answer          String?
+
+  // Relations
+  // Linked to review progress of different users
+  progress        Progress[]
+
+  // Constraint to ensure the same category + ID is not entered twice
+  @@unique([platform, pid])
+}
+
+// -----------------------------------------------------------------------------
+// Progress: Stores learning state between User and Question (八股文复习进度)
+// -----------------------------------------------------------------------------
+model Progress {
+  id           String   @id @default(cuid())
+
+  // Foreign Key Relations
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  problemId    String
+  problem      Problem  @relation(fields: [problemId], references: [id])
+
+  // Learning State
+  // Current status: Todo, Solved, Reviewing
+  status       String   @default("Todo")
+  // Personal notes for this question
+  notes        String?
+
+  // SRS Algorithm part, drives the review schedule
+  // The most recent self-assessed mastery score (0-4 for八股文: 0=不记得, 2=模糊, 4=记得)
+  masteryLevel Int      @default(0)
+  // The next review interval in days calculated by the SRS algorithm
+  interval     Int      @default(0)
+  // Easiness factor (E-Factor), dynamically adjusted based on ratings
+  easiness     Float    @default(2.5)
+  // Total number of times this question has been reviewed
+  reviewCount  Int      @default(0)
+  // The timestamp of the last actual review/rating
+  lastReview   DateTime?
+  // The next scheduled review time calculated by the algorithm
+  nextReview   DateTime @default(now())
+
+  // Relations
+  // Code/text submissions for this question (kept for compatibility)
+  submissions  Submission[]
+
+  // Creation timestamp
+  createdAt    DateTime @default(now())
+  // Automatically refreshed every time the progress is updated
+  updatedAt    DateTime @updatedAt
+
+  // Constraint ensuring a user has only one progress record per question
+  @@unique([userId, problemId])
+}
+
+// -----------------------------------------------------------------------------
+// Submission: Stores user's answer attempts or notes (kept for compatibility)
+// -----------------------------------------------------------------------------
+model Submission {
+  id         String   @id @default(cuid())
+
+  // Foreign Key Relation
+  progressId String
+  progress   Progress @relation(fields: [progressId], references: [id])
+
+  // Content
+  // Language/format identifier (e.g., "text", "markdown")
+  language   String
+  // The actual answer text or notes
+  code       String
+  // Whether this is the main/default version
+  isMain     Boolean  @default(false)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
