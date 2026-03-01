@@ -39,6 +39,7 @@ export default async function QuestionEditPage({
   }
 
   const initialData: EditorFormData = {
+    platform: progress.problem.platform, // 问题分类
     pid: progress.problem.pid,
     title: progress.problem.title,
     difficulty: progress.problem.difficulty,
@@ -46,6 +47,7 @@ export default async function QuestionEditPage({
     tags: progress.problem.tags ? progress.problem.tags.split(",") : [],
     link: progress.problem.url || "",
     answer: progress.problem.answer || "", // 八股文答案
+    answerKeywords: progress.problem.answerKeywords || "", // 答案关键词
     language: progress.submissions[0]?.language || user.preferredLang,
     code: progress.submissions[0]?.code || "",
     masteryLevel: progress.masteryLevel,

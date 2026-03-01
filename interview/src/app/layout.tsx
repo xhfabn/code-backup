@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 
 import { prisma } from "@/lib/db";
-import OnboardingPage from "@/app/onboarding/page";
 import DashboardStateInitializer from "@/components/layout/DashboardStateInitializer";
 
 export const metadata: Metadata = {
@@ -22,14 +21,8 @@ export default async function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="antialiased bg-gray-50 text-gray-900 selection:bg-[#3b82f6] selection:text-white">
-        {user ? (
-          <>
-            <DashboardStateInitializer user={user} />
+        {user && <DashboardStateInitializer user={user} />}
             {children}
-          </>
-        ) : (
-          <OnboardingPage />
-        )}
       </body>
     </html>
   );

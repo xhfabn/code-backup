@@ -61,6 +61,8 @@ model Problem {
   tags            String
   // Standard answer for the question (八股文答案)
   answer          String?
+  // Answer keywords, stored as a comma-separated string (e.g., "递归,时间复杂度,空间优化")
+  answerKeywords  String?
 
   // Relations
   // Linked to review progress of different users

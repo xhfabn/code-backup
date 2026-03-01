@@ -33,13 +33,14 @@ export async function saveQuestionAction(formData: EditorFormData) {
 
     const now = new Date();
     const nextReviewDate = getNextReviewDate(1);
+    const platform = formData.platform || "计算机基础";
 
     await prisma.$transaction(async (tx) => {
       // process Problem
       const problem = await tx.problem.upsert({
         where: {
           platform_pid: {
-            platform: "计算机基础",
+            platform: platform,
             pid: formData.pid,
           },
         },
@@ -50,9 +51,10 @@ export async function saveQuestionAction(formData: EditorFormData) {
           tags: formData.tags.join(","),
           url: formData.link,
           answer: formData.answer || null, // 八股文答案
+          answerKeywords: formData.answerKeywords || null, // 答案关键词
         },
         create: {
-          platform: "计算机基础",
+          platform: platform,
           pid: formData.pid,
           title: formData.title,
           difficulty: formData.difficulty,
@@ -60,6 +62,7 @@ export async function saveQuestionAction(formData: EditorFormData) {
           tags: formData.tags.join(","),
           url: formData.link,
           answer: formData.answer || null, // 八股文答案
+          answerKeywords: formData.answerKeywords || null, // 答案关键词
         },
       });
 

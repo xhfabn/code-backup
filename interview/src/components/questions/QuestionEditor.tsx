@@ -10,6 +10,7 @@ import { EditorHeader } from './editor/EditorHeader';
 import { CodeSection } from './editor/CodeSection';
 import { MetaSidebar } from './editor/MetaSidebar';
 import { AnswerSection } from './editor/AnswerSection';
+import { KeywordsSection } from './editor/KeywordsSection';
 import { NoteSection } from './editor/NoteSection';
 import { EditorFormData, QuestionEditorProps } from '@/types/editor';
 
@@ -22,12 +23,14 @@ export default function QuestionEditor({
 
   // for Create
   const EMPTY_DATA: EditorFormData = {
+    platform: '计算机基础',
     pid: '',
     title: '',
     difficulty: 'Medium',
     tags: [],
     link: '',
     answer: '',
+    answerKeywords: '',
     language: preferredLang,
     code: '',
     masteryLevel: 0,
@@ -137,6 +140,13 @@ export default function QuestionEditor({
 
           <div className="shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-[2rem] overflow-hidden border border-white/60 bg-white/60 backdrop-blur-xl">
             <AnswerSection answer={formData.answer || ''} onUpdate={handleUpdate} />
+          </div>
+
+          <div className="shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-[2rem] overflow-hidden border border-white/60 bg-white/60 backdrop-blur-xl">
+            <KeywordsSection
+              value={formData.answerKeywords || ''}
+              onChange={(value) => handleUpdate('answerKeywords', value)}
+            />
           </div>
 
           <div className="shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-[2rem] overflow-hidden border border-white/60 bg-white/60 backdrop-blur-xl">

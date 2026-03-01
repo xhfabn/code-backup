@@ -1,80 +1,39 @@
-import { useMemo } from "react";
-import { useTranslation } from "@/hooks/useTranslation";
-
-import { ReviewTask } from "@/types/review";
-
-import { BrainCircuit, Clock } from "lucide-react";
-
+import { BrainCircuit } from 'lucide-react';
 
 interface ReviewHeaderProps {
-  reviews:ReviewTask[];
+  total: number;
+  completed: number;
 }
 
-export const ReviewHeader = ({ reviews }: ReviewHeaderProps) => {
-  const { t } = useTranslation();
-
-  const count = reviews.length;
-
-  const totalEstimatedTime = useMemo(() => {
-    let total = 0;
-
-    for(const task of reviews){
-      const diff = task.difficulty.toLowerCase();
-      const mastery = task.masteryLevel;
-
-      // default hard
-      let min = 7, max = 15;
-
-      if (["easy", "容易", "简单"].includes(diff)) {
-        min = 3; max = 7;
-      } else if (["medium", "中等"].includes(diff)) {
-        min = 5; max = 12;
-      }
-
-      // random time
-      let baseTime = Math.floor(Math.random() * (max - min + 1)) + min;
-
-      // adjust by mastery level
-      const masteryWeight = 1 - (mastery * 0.1); 
-      const finalTaskTime = Math.max(min, Math.round(baseTime * masteryWeight));
-
-      total += finalTaskTime;
-
-    }
-
-    return total;
-  },[reviews]);
+export const ReviewHeader = ({ total, completed }: ReviewHeaderProps) => {
+  const remaining = total - completed;
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-      <div className="space-y-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight flex items-center gap-4">
-          <div className="p-3 bg-blue-50 text-[#3b82f6] rounded-2xl shadow-sm border border-blue-100/50">
-            <BrainCircuit size={40} strokeWidth={2.5} />
-          </div>
-          {t("reviewHeader.title")}
-        </h1>
-        <p className="text-gray-500 text-lg md:text-xl font-medium max-w-2xl leading-relaxed">
-          {count > 0
-            ? t("reviewHeader.descriptionWithCount").replace(
-                "{{count}}",
-                count.toString()
-              )
-            : t("reviewHeader.descriptionEmpty")}
-        </p>
+    <div className="flex items-center justify-between gap-6">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl shadow-sm border border-blue-100/50 shrink-0">
+          <BrainCircuit size={28} strokeWidth={2.5} />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+            今日复习
+          </h1>
+          <p className="text-sm text-gray-500 font-medium mt-0.5">
+            {remaining > 0 ? (
+              <>还剩 <span className="font-bold text-gray-700">{remaining}</span> 张</>
+            ) : (
+              '全部完成 🎉'
+            )}
+          </p>
+        </div>
       </div>
 
-      {count > 0 && (
-        <div className="flex items-center gap-2.5 bg-white/80 backdrop-blur-md text-gray-600 px-5 py-2.5 rounded-2xl text-sm font-bold border border-gray-200/60 shadow-sm whitespace-nowrap">
-          <Clock size={18} className="text-[#3b82f6]" />
-          <span>
-            {t("reviewHeader.estimatedTime").replace(
-              "{{time}}",
-              totalEstimatedTime.toString()
-            )}
-          </span>
-        </div>
-      )}
+      {/* Compact X/Y counter */}
+      <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-2xl border border-gray-200/60 shadow-sm shrink-0">
+        <span className="text-xl font-black text-gray-900">{completed}</span>
+        <span className="text-gray-300 font-bold">/</span>
+        <span className="text-base font-bold text-gray-400">{total}</span>
+      </div>
     </div>
   );
 };

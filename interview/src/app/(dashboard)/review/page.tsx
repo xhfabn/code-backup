@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import ReviewPageClient from '@/components/review/ReviewPageClient';
 import { ReviewTask } from '@/types/review';
 
+export const revalidate = 0; // always fetch fresh data on every navigation
+
 export default async function ReviewPage() {
   const user = await prisma.user.findFirst();
   if (!user) {
@@ -59,6 +61,7 @@ export default async function ReviewPage() {
     notes: p.notes,
     tags: p.problem.tags,
     answer: p.problem.answer, // 八股文答案
+    answerKeywords: p.problem.answerKeywords, // 答案关键词
     submissions: p.submissions,
   }));
 

@@ -27,3 +27,4 @@ export const registerUser = async ({
   revalidatePath("/");
   redirect("/home");
 };
+

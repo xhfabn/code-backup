@@ -1,11 +1,13 @@
 export interface EditorFormData {
   // Problem
+  platform?: string; // 问题分类
   pid: string;
   title: string;
   difficulty: string;
   tags: string[];
   link: string;
   answer?: string; // 八股文标准答案
+  answerKeywords?: string; // 答案关键词
 
   // Submission
   language: string;
